@@ -1,0 +1,282 @@
+import dash
+import dash_bootstrap_components as dbc
+from dash import Input, Output, dcc, html
+import pandas as pd
+import plotly.express as px
+import base64
+
+app = dash.Dash(external_stylesheets=[dbc.themes.BOOTSTRAP])
+df = pd.read_csv('Campeoes_Libertadores.csv')
+df2 = pd.read_csv('titulos_por_pais')
+df3 = pd.read_csv('mais_titulos')
+df3_1 = pd.read_csv('percentual_campeoes')
+df4 = pd.read_csv('artilheiros')
+df5 = pd.read_csv('artilheiros_brasileiros')
+df6 = pd.read_csv('artilheiros_brasileiros_atividade')
+df7 = pd.read_csv('ultimos_10_campeoes')
+df8 = pd.read_csv('ultimos_10_campeos_pais')
+df9 = pd.read_csv('paises_finais')
+df10 = pd.read_csv('artilheiros_por_edicao')
+df_copy = df
+df_copy2 = df2
+df_copy3 = df3
+df_copy3_1 = df3_1
+df_copy4 = df4
+df_copy5 = df5
+df_copy6 = df6
+df_copy7 = df7
+df_copy8 = df8
+df_copy9 = df9
+df_copy10 = df10
+image_penarol = 'assets/campeao.jpg'
+image_estudiantes = 'assets/estudiantes.jpg'
+image_santos = 'assets/santos.jpg'
+
+
+def b64_penarol(image_penarol):
+    with open(image_penarol, 'rb') as f:
+        image = f.read()
+    return 'data:campeao/jpg;base64,' + base64.b64encode(image).decode('utf-8')
+
+
+def b64_estudiantes(image_estudiantes):
+    with open(image_estudiantes, 'rb') as f:
+        image = f.read()
+    return 'data:estudiantes/jpg;base64,' + base64.b64encode(image).decode('utf-8')
+
+
+def b64_santos(image_santos):
+    with open(image_santos, 'rb') as f:
+        image = f.read()
+    return 'data:santos/jpg;base64,' + base64.b64encode(image).decode('utf-8')
+
+
+opcoes = ['Títulos por país', 'Maiores campeões', 'Maiores artilheiros', 'Maiores artilheiros brasileiros',
+          'Maiores artilheiros brasileiros em atividade', 'Maiores artilheiros em uma única edição']
+
+opcoes_pizza = ['Títulos por país', 'Todos os campeões', 'Últimos 10 campeões (por time)',
+                'Últimos 10 campeões (por país)', 'Finais disputadas por país']
+
+fig = px.bar(df_copy2, x='Países', y='Títulos')
+fig_percentual = px.pie(df_copy2, values='Títulos', names='Países')
+
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "16rem",
+    "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
+}
+
+# the styles for the main content position it to the right of the sidebar and
+# add some padding.
+CONTENT_STYLE = {
+    "margin-left": "18rem",
+    "margin-right": "2rem",
+    "padding": "2rem 1rem",
+}
+
+style_img = {
+    "margin-left": "-1rem",
+    "margin-right": "15rem",
+    "padding": "2rem 1rem"
+}
+
+style_legend = {
+    "margin-left": "0rem"
+
+}
+
+style_estudiantes = {
+    "margin-left": "20rem"
+
+}
+sidebar = html.Div(
+    [
+        html.H2("Sidebar", className="display-4"),
+        html.Hr(),
+        html.P(
+            "Escolha sobre o que quer saber da Copa Libertadores!", className="lead"
+        ),
+        dbc.Nav(
+            [
+                dbc.NavLink("História", href="/", active="exact"),
+                dbc.NavLink("Estatísticas", href="/page-1", active="exact"),
+                dbc.NavLink("Sobre", href="/page-2", active="exact"),
+            ],
+            vertical=True,
+            pills=True,
+        ),
+    ],
+    style=SIDEBAR_STYLE,
+)
+
+content = html.Div(id="page-content", style=CONTENT_STYLE)
+
+app.layout = html.Div([dcc.Location(id="url"), sidebar, content])
+
+
+@app.callback(Output("page-content", "children"), [Input("url", "pathname")])
+def render_page_content(pathname):
+    if pathname == "/":
+        return html.Div(children=[
+            html.H1(children='História da Copa Libertadores da América'),
+            html.H2(
+                children='Aqui você vai ler brevemente sobre como surgiu a Copa Libertadores da América e qual a sua '
+                         'importância para o futebol sulamericano!'),
+            html.P(children='   A Copa Libertadores da América é a principal competição de clubes da América do Sul, '
+                            'criada em 1960 pela CONMEBOL. O seu nome faz referência aos principais líderes da '
+                            'independência dos países sulamericanos.\n    A primeira edição foi disputada em 1960, '
+                            'contava com a participação de sete equipes e foi'
+                            'vencida pelo Peñarol, equipe uruguaia. Até a atual edição (2022), 25 times diferentes '
+                            'foram capazes de eternizarem seus nomes na tão sonhada taça. Só no Brasil, temos 7 times'
+                            'distintos que já foram campeões. Para saber sobre mais dados como esses, acesse nossa '
+                            'aba "Estatísticas" na barra lateral da página.'),
+            html.Div(children=[
+                html.Img(title='Time do Peñarol em 1960', src=b64_penarol(image_penarol), style=style_img),
+                html.Img(title='Time Santos em 1962', src=b64_santos(image_santos)),
+                html.Img(title='Time Estudiantes em 1968', src=b64_estudiantes(image_estudiantes),
+                         style=style_estudiantes),
+                html.H6('Da esquerda pra direita, temos os times do Peñarol (1960), Santos (1962) e Estudiantes '
+                        '(1968), respectivamente. Peñarol foi o primeiro campeão, o Santos foi o primeiro  '
+                        'brasileiro a conquistar a Taça, enquanto o Estudiantes foi o primeiro time a conquistar o '
+                        'tricampeonato consecutivo.')
+            ])
+        ]),
+
+    elif pathname == "/page-1":
+        return html.Div(children=[
+            html.H1(children='Estatísticas da Copa Libertadores da América'),
+            html.H2(children='Aqui você encontra tudo sobre a Copa Libertadores! Experimente usar os nossos gráficos '
+                             'interativos abaixo!'),
+
+            dcc.Dropdown(opcoes, value='Títulos por país', id='opcoes_graficos'),
+            html.H6(children='Este gráfico mostra a quantidade de títulos conquistados por países participantes.',
+                    id='info'),
+
+            dcc.Graph(
+                id='grafico_titulos_pais',
+                figure=fig
+            ),
+
+            dcc.Dropdown(opcoes_pizza, value='Títulos por país', id='opcoes_percentual'),
+            html.H6(children='Este gráfico mostra o percentual de títulos conquistados por países participantes.',
+                    id='info_percentual'),
+            dcc.Graph(
+                id='grafico_percentual',
+                figure=fig_percentual
+            )
+
+        ])
+    elif pathname == "/page-2":
+        return html.Div(children=[
+            html.H1(children='Sobre'),
+            html.P(children='Projeto criado em base do trabalho final de Python (administrado pelo professor Lucas '
+                            'Loureiro) do curso da EFMAT (Escola de Física e Matemática Aplicada). O foco do projeto'
+                            ' constitui na criação de uma dashboard (aba "Estatística" da sidebar), o qual eu escolhi '
+                            'fazer análises das estatísticas do campeonato de futebol "Copa Libertadores da América", '
+                            'trazendo dados sobre os campeões, artilheiros *********CONTINUAR************'),
+            html.P(children='Todos os dados foram retirados de pesquisas feitas pela internet, com base nos '
+                            'dados oficiais da CONMEBOLL (organizadora oficial da Copa Libertadores da América).'),
+            html.P(children='Esse trabalho é de autoria de Marcos Paulo de Oliveira. ')
+
+        ])
+
+
+@app.callback(
+    Output('grafico_titulos_pais', 'figure'),
+    Input('opcoes_graficos', 'value')
+)
+def update_graph(value):
+    if value == 'Títulos por país':
+        figg = px.bar(df_copy2, x='Países', y='Títulos', title='Títulos conquistados por país')
+        figg.update_traces(marker_color='orange')
+        return figg
+    elif value == 'Maiores campeões':
+        figg = px.bar(df_copy3, x='Times', y='Títulos', title='Top 5 campeões da Libertadores')
+        figg.update_traces(marker_color='orange')
+        return figg
+    elif value == 'Maiores artilheiros':
+        figg = px.bar(df_copy4, x='Artilheiros', y='Gols', title='Top 5 maiores artilheiros da Libertadores')
+        figg.update_traces(marker_color='orange')
+        return figg
+    elif value == 'Maiores artilheiros brasileiros':
+        figg = px.bar(df_copy5, x='Artilheiros brasileiros', y='Gols', title=' Top 5 maiores artilheiros brasileiros '
+                                                                             'da Libertadores')
+        figg.update_traces(marker_color='orange')
+        return figg
+    elif value == 'Maiores artilheiros brasileiros em atividade':
+        figg = px.bar(df_copy6, x='Artilheiros brasileiros que ainda estão em atividade', y='Gols',
+                      title='Top 5 maiores artilheiros brasileiros que ainda estão em atividade')
+        figg.update_traces(marker_color='orange')
+        return figg
+    elif value == 'Maiores artilheiros em uma única edição':
+        figg = px.bar(df_copy10, x='Jogadores', y='Gols', title='Top 5 maiores artilheiros em uma única edição')
+        figg.update_traces(marker_color='orange')
+        return figg
+
+
+@app.callback(
+    Output('info', 'children'),
+    Input('opcoes_graficos', 'value')
+)
+def update_text(value):
+    if value == 'Títulos por país':
+        return 'Este gráfico mostra a quantidade de títulos conquistados por países participantes.'
+    elif value == 'Maiores campeões':
+        return 'Este gráfico mostra os maiores campeões da Libertadores.'
+    elif value == 'Maiores artilheiros':
+        return 'Este gráfico mostra os maiores artilheiros da história da Libertadores.'
+    elif value == 'Maiores artilheiros brasileiros':
+        return 'Este gráfico mostra os maiores artilheiros brasileiros da história da Libertadores.'
+    elif value == 'Maiores artilheiros brasileiros em atividade':
+        return 'Este gráfico mostra os maiores artilheiros brasileiros da história da Libertadores que ainda estão em' \
+               ' atividade.'
+    elif value == 'Maiores artilheiros em uma única edição':
+        return 'Este gráfico mostra os maiores artilheiros em uma única edição da Libertadores. '
+
+
+@app.callback(
+    Output('grafico_percentual', 'figure'),
+    Input('opcoes_percentual', 'value')
+)
+def update_percentual(value):
+    if value == 'Títulos por país':
+        return px.pie(df_copy2, values='Títulos', names='Países', title='Títulos conquistados por país '
+                                                                        '(em percentual)')
+    elif value == 'Todos os campeões':
+        return px.pie(df_copy3_1, values='Títulos', names='Times', title='Todos os campeões (em percentual)')
+    elif value == 'Últimos 10 campeões (por time)':
+        return px.pie(df_copy7, values='Títulos', names='Times', title='Últimos 10 times campeões '
+                                                                       '(em percentual)')
+    elif value == 'Últimos 10 campeões (por país)':
+        return px.pie(df_copy8, values='Títulos', names='País', title='Últimos 10 países campeões '
+                                                                      '(em percentual)')
+    elif value == 'Finais disputadas por país':
+        return px.pie(df_copy9, values='Finais', names='Países', title='Quantidade de vezes em que os países '
+                                                                       'foram finalistas (em percentual)')
+
+
+@app.callback(
+    Output('info_percentual', 'children'),
+    Input('opcoes_percentual', 'value')
+)
+def update_text_percentual(value):
+    if value == 'Títulos por país':
+        return 'Este gráfico mostra o percentual de títulos conquistados por países participantes.'
+    elif value == 'Maiores campeões':
+        return 'Este gráfico mostra o percentual de títulos conquistados por times participantes.'
+    elif value == 'Últimos 10 campeões (por time)':
+        return 'Este gráfico mostra o percentual de títulos conquistados por times participantes nas últimas dez' \
+               ' edições.'
+    elif value == 'Últimos 10 campeões (por país)':
+        return 'Este gráfico mostra o percentual de títulos conquistados por países participantes nas últimas dez' \
+               ' edições.'
+    elif value == 'Finais disputadas por país':
+        return 'Este gráfico mostra o percentual de finais por países participantes.'
+
+
+if __name__ == '__main__':
+    app.run_server(debug=True)
