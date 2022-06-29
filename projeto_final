@@ -17,6 +17,10 @@ df7 = pd.read_csv('ultimos_10_campeoes')
 df8 = pd.read_csv('ultimos_10_campeos_pais')
 df9 = pd.read_csv('paises_finais')
 df10 = pd.read_csv('artilheiros_por_edicao')
+df11 = pd.read_csv('maiores_participantes')
+df12 = pd.read_csv('maiores_participantes_br')
+df13 = pd.read_csv('mais_vices')
+df14 = pd.read_csv('vitorias')
 df_copy = df
 df_copy2 = df2
 df_copy3 = df3
@@ -28,6 +32,10 @@ df_copy7 = df7
 df_copy8 = df8
 df_copy9 = df9
 df_copy10 = df10
+df_copy11 = df11
+df_copy12 = df12
+df_copy13 = df13
+df_copy14 = df14
 image_penarol = 'assets/campeao.jpg'
 image_estudiantes = 'assets/estudiantes.jpg'
 image_santos = 'assets/santos.jpg'
@@ -52,7 +60,9 @@ def b64_santos(image_santos):
 
 
 opcoes = ['Títulos por país', 'Maiores campeões', 'Maiores artilheiros', 'Maiores artilheiros brasileiros',
-          'Maiores artilheiros brasileiros em atividade', 'Maiores artilheiros em uma única edição']
+          'Maiores artilheiros brasileiros em atividade', 'Maiores artilheiros em uma única edição', 'Clubes com mais'
+                                                                                                     ' participações',
+          'Clubes brasileiros com mais participações', 'Clubes que mais vezes disputaram a final', 'Clubes com mais vitórias']
 
 opcoes_pizza = ['Títulos por país', 'Todos os campeões', 'Últimos 10 campeões (por time)',
                 'Últimos 10 campeões (por país)', 'Finais disputadas por país']
@@ -213,7 +223,26 @@ def update_graph(value):
         figg.update_traces(marker_color='orange')
         return figg
     elif value == 'Maiores artilheiros em uma única edição':
-        figg = px.bar(df_copy10, x='Jogadores', y='Gols', title='Top 5 maiores artilheiros em uma única edição')
+        figg = px.bar(df_copy10, x='Jogadores', y='Gols', title='Top 5 maiores artilheiros da Libertadores em uma'
+                                                                ' única edição')
+        figg.update_traces(marker_color='orange')
+        return figg
+    elif value == 'Clubes com mais participações':
+        figg = px.bar(df_copy11, x='Times', y='Participações', title='Top 5 clubes com mais participações na'
+                                                                     ' Libertadores')
+        figg.update_traces(marker_color='orange')
+        return figg
+    elif value == 'Clubes brasileiros com mais participações':
+        figg = px.bar(df_copy12, x='Times', y='Participações', title='Top 5 clubes brasileiros com mais participações'
+                                                                     ' na Libertadores')
+        figg.update_traces(marker_color='orange')
+        return figg
+    elif value == 'Clubes que mais vezes disputaram a final':
+        figg = px.bar(df_copy13, x='Times', y='Finais', title='Top 5 times com mais finais')
+        figg.update_traces(marker_color='orange')
+        return figg
+    elif value == 'Clubes com mais vitórias':
+        figg = px.bar(df_copy14, x='Times', y='Vitórias', title='Top 5 times com mais vitórias na Libertadores *')
         figg.update_traces(marker_color='orange')
         return figg
 
@@ -235,7 +264,16 @@ def update_text(value):
         return 'Este gráfico mostra os maiores artilheiros brasileiros da história da Libertadores que ainda estão em' \
                ' atividade.'
     elif value == 'Maiores artilheiros em uma única edição':
-        return 'Este gráfico mostra os maiores artilheiros em uma única edição da Libertadores. '
+        return 'Este gráfico mostra os maiores artilheiros em uma única edição da Libertadores.'
+    elif value == 'Clubes com mais participações':
+        return 'Este gráfico mostra os clubes com mais participações na história da Libertadores.'
+    elif value == 'Clubes brasileiros com mais participações':
+        return 'Este gráfico mostra os clubes brasileiros com mais participações na história da Libertadores.'
+    elif value == 'Clubes que mais vezes disputaram a final':
+        return 'Este gráfico mostra os clubes que mais participaram das finais da Libertadores'
+    elif value == 'Clubes com mais vitórias':
+        return 'Este gráfico mostra os clubes com mais vitórias na história da Libertadores *(dados atualizados no ' \
+               'dia 18/08/2021).'
 
 
 @app.callback(
